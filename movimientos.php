@@ -44,7 +44,7 @@ return $jsonHash['hash'];
 
 $hash=token();
 
-include "./list.php";
+include "list.php";
 
 
 
@@ -230,7 +230,7 @@ echo
 
                     echo "<br>";
 
-                 //  $resutaldo = mysqli_query($mysqli, $qry);
+                   $resutaldo = mysqli_query($mysqli, $qry);
                 }
             }
         }
