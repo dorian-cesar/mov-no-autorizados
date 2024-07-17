@@ -1,48 +1,91 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require './vendor/autoload.php'; // Asegúrate de tener la librería PHPMailer instalada
+
+
 date_default_timezone_set('America/Santiago'); // Ajusta a la zona horaria de Santiago de Chile
 
 include "conexion.php";
 
-function token(){
-    
-$curl = curl_init();
+function token()
+{
 
-curl_setopt_array($curl, array(
-  CURLOPT_URL => 'http://www.trackermasgps.com/api-v2/user/auth',
-  CURLOPT_RETURNTRANSFER => true,
-  CURLOPT_ENCODING => '',
-  CURLOPT_MAXREDIRS => 10,
-  CURLOPT_TIMEOUT => 0,
-  CURLOPT_FOLLOWLOCATION => true,
-  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  CURLOPT_CUSTOMREQUEST => 'POST',
-  CURLOPT_POSTFIELDS =>'{"login":"controlveh@masgps.com","password":"Control_2024","dealer_id":10004282,"locale":"es","hash":null}',
-  CURLOPT_HTTPHEADER => array(
-    'Accept: application/json, text/plain, */*',
-    'Accept-Language: es-419,es;q=0.9,en;q=0.8',
-    'Connection: keep-alive',
-    'Content-Type: application/json',
-    'Cookie: _ga=GA1.2.728367267.1665672802; _gid=GA1.2.343013326.1670594107; locale=es; _gat=1',
-    'Origin: http://www.trackermasgps.com',
-    'Referer: http://www.trackermasgps.com/',
-    'User-Agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Mobile Safari/537.36'
-  ),
-));
+    $curl = curl_init();
 
-$response = curl_exec($curl);
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => 'http://www.trackermasgps.com/api-v2/user/auth',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS => '{"login":"controlveh@masgps.com","password":"Control_2024","dealer_id":10004282,"locale":"es","hash":null}',
+        CURLOPT_HTTPHEADER => array(
+            'Accept: application/json, text/plain, */*',
+            'Accept-Language: es-419,es;q=0.9,en;q=0.8',
+            'Connection: keep-alive',
+            'Content-Type: application/json',
+            'Cookie: _ga=GA1.2.728367267.1665672802; _gid=GA1.2.343013326.1670594107; locale=es; _gat=1',
+            'Origin: http://www.trackermasgps.com',
+            'Referer: http://www.trackermasgps.com/',
+            'User-Agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Mobile Safari/537.36'
+        ),
+    ));
 
-curl_close($curl);
-//echo $response;
+    $response = curl_exec($curl);
 
-$jsonHash=json_decode($response);
+    curl_close($curl);
+    //echo $response;
 
-return $jsonHash->hash;
+    $jsonHash = json_decode($response);
 
-return $jsonHash['hash'];
+    return $jsonHash->hash;
 
+    return $jsonHash['hash'];
 };
 
-$hash=token();
+$hash = token();
+
+if (!$hash) {
+    sendEmail();
+    exit('Token function did not return a value.');
+}
+
+
+function sendEmail() {
+    $mail = new PHPMailer;
+    $mail->isSMTP();
+    $mail->Host = 'smtp.gmail.com'; // Cambia esto por tu servidor SMTP
+    $mail->SMTPAuth = true;
+    $mail->Username = 'mailer.wit@gmail.com'; // Cambia esto por tu correo electrónico
+    $mail->Password = 'qzyuwykitiekjsku'; // Cambia esto por tu contraseña
+    $mail->SMTPSecure = 'tls'; // O 'ssl' si es necesario
+    $mail->Port = 587; // Puerto SMTP
+
+    $mail->setFrom('desarrollo.wit@gmail.com', 'Desarrollo Wit');
+   
+    $mail->addAddress('dorian.celu@gmail.com', 'Dorian G');
+    $mail->addAddress('itorres@wit.la', 'Israel T.');
+   // $mail->setFrom('your-email@example.com', 'Mailer');
+   // $mail->addAddress('recipient@example.com', 'Recipient'); // Añadir destinatario
+
+    $mail->isHTML(true);
+    $mail->Subject = 'Movimientos-No-Autorizados';
+    $mail->Body    = 'No se logro obtener  Token (hash)';
+
+    if(!$mail->send()) {
+        echo 'Message could not be sent.';
+        echo 'Mailer Error: ' . $mail->ErrorInfo;
+    } else {
+        echo 'Message has been sent';
+    }
+}
+
+
 
 include "list.php";
 
@@ -83,12 +126,12 @@ if ($currentDay >= 1 && $currentDay <= 5) {
 
     //$hash = 'ad39ddd21a18bd863a51a47c814d3f17';
 
-   $hash=token();
+    $hash = token();
 
     $fromUrl = urlencode($from);
 
     $toUrl = urlencode($to);
-   // $trackers = urlencode("[10180690,10182419,10182728,10188754,10189478,10191084,10192115,10196194,10196198,10196241,10196252,10196259,10196465,10196550,10202082,10204598,10204620,10205706,10208019,10208020,10208021,10208345,10209395,10209398,10209407,10209411,10209418,10209428,10209431,10209877,10210547,10212544,10212549,10212550,10212630,10213010,10213516,10213527,10213540,10214696,10214697,10214700,10214701,10214704,10215925,10218214,10218463,10218469,10219406,10222354,10222356,10222361,10222383,10223941,10224569,10225580,10225853,10225870,10235806,10235832,10245566,10245575,10245627,10245641,10245689,10245929,10245930,10245946,10247485,10247868,10252677,10254109]");
+    // $trackers = urlencode("[10180690,10182419,10182728,10188754,10189478,10191084,10192115,10196194,10196198,10196241,10196252,10196259,10196465,10196550,10202082,10204598,10204620,10205706,10208019,10208020,10208021,10208345,10209395,10209398,10209407,10209411,10209418,10209428,10209431,10209877,10210547,10212544,10212549,10212550,10212630,10213010,10213516,10213527,10213540,10214696,10214697,10214700,10214701,10214704,10215925,10218214,10218463,10218469,10219406,10222354,10222356,10222361,10222383,10223941,10224569,10225580,10225853,10225870,10235806,10235832,10245566,10245575,10245627,10245641,10245689,10245929,10245930,10245946,10247485,10247868,10252677,10254109]");
     $trackers = $idss;
     $title = urlencode('Informe de viaje');
 
@@ -122,7 +165,7 @@ if ($currentDay >= 1 && $currentDay <= 5) {
             'User-Agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36'
         ),
     ));
-echo
+    echo
     $informe = curl_exec($curl);
 
 
@@ -230,7 +273,7 @@ echo
 
                     echo "<br>";
 
-                   $resutaldo = mysqli_query($mysqli, $qry);
+                    $resutaldo = mysqli_query($mysqli, $qry);
                 }
             }
         }
