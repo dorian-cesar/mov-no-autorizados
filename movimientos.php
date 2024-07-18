@@ -2,7 +2,7 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require './vendor/autoload.php'; // Asegúrate de tener la librería PHPMailer instalada
+require 'vendor/autoload.php'; // Asegúrate de tener la librería PHPMailer instalada
 
 
 date_default_timezone_set('America/Santiago'); // Ajusta a la zona horaria de Santiago de Chile
